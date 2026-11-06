@@ -15,4 +15,33 @@ jobs:
         with:
           node-version: '20'
       - run: npm install
-      - run: npm test          # ← the new, important line
+      - run: npm test
+
+  build:
+    needs: test                 # ← only build if tests passed
+    if: github.event_name == 'push'   # don't push images for PRs, only merges
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write           # ← lets the token push to GHCR
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set lowercase image name
+        run: echo "IMAGE=ghcr.io/${GITHUB_REPOSITORY,,}" >> "$GITHUB_ENV"
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: true
+          tags: |
+            ${{ env.IMAGE }}:${{ github.sha }}
+            ${{ env.IMAGE }}:latest
