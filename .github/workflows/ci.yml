@@ -16,6 +16,6 @@ jobs:                             # ── JOBS: parallel units of work ──
         with:                                # inputs to the action
           node-version: '20'
       - name: Install deps
-        run: npm ci                          # shell command
+        run: npm install                          # shell command
       - name: Run app smoke test
         run: node -e "console.log('it loads')"
