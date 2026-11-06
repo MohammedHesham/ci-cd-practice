@@ -1,16 +1,21 @@
-name: CI
+name: CI                          # workflow name (shown in the Actions tab)
 
-on: push              # run this workflow on every push
+on:                               # ── TRIGGERS: when does this run? ──
+  push:
+    branches: [main]              # only pushes to main
+  pull_request:                   # also on PRs targeting...
+    branches: [main]
+  workflow_dispatch:              # ...and a manual "Run workflow" button
 
-jobs:
-  hello:              # a job named "hello"
-    runs-on: ubuntu-latest    # which runner to use
-    steps:
-      - name: Say hello
-        run: echo "My first pipeline is running!"
-
-      - name: Show the machine
-        run: |
-          echo "Running on:"
-          uname -a
-          echo "In directory: $(pwd)"
+jobs:                             # ── JOBS: parallel units of work ──
+  test:
+    runs-on: ubuntu-latest        # the runner VM
+    steps:                        # ── STEPS: run top to bottom ──
+      - uses: actions/checkout@v4            # action: clone the repo
+      - uses: actions/setup-node@v4          # action: install Node
+        with:                                # inputs to the action
+          node-version: '20'
+      - name: Install deps
+        run: npm ci                          # shell command
+      - name: Run app smoke test
+        run: node -e "console.log('it loads')"
