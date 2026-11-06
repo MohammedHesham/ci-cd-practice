@@ -1,0 +1,16 @@
+name: CI
+
+on: push              # run this workflow on every push
+
+jobs:
+  hello:              # a job named "hello"
+    runs-on: ubuntu-latest    # which runner to use
+    steps:
+      - name: Say hello
+        run: echo "My first pipeline is running!"
+
+      - name: Show the machine
+        run: |
+          echo "Running on:"
+          uname -a
+          echo "In directory: $(pwd)"
